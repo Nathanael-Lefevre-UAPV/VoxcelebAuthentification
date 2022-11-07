@@ -1,0 +1,5 @@
+unzip sb-docker_latest.zip
+docker load --input sb-docker_latest.tar
+docker run -p 3000:5002 sb-docker -p 5002
+
+use a python program to send the files to the server (ex: client.py)
