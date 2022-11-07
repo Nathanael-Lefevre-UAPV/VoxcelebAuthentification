@@ -1,6 +1,7 @@
 import operator
+import tqdm
 
-from ScoreRequester import HPScoreRequester
+from ScoreRequester import HPScoreRequester, AchilleScoreRequester
 from Data.WavDataset import TarWavDataset, NonWavDataset
 
 
@@ -31,32 +32,44 @@ class ThresholdPredictor(Predictor):
 
 
 if __name__ == "__main__":
-    scoreReq = HPScoreRequester()
+    scoreReq = AchilleScoreRequester()
 
-    tarWavDataset = TarWavDataset()
-    nonWavDataset = NonWavDataset()
+    tarWavDataset = TarWavDataset(length=10)
+    nonWavDataset = NonWavDataset(length=10)
     print(len(tarWavDataset))
     print(len(nonWavDataset))
 
     predictor = DefaultPredictor(scoreReq)
 
-    FP = 0  # False Positive
-    TN = 0  # True Negative
+    print(nonWavDataset[0])
+    print(tarWavDataset[0])
+
+    wavCouple = ["Data/wav/id10270/x6uYqmx31kE/00001.wav", "Data/wav/id10300/ize_eiCFEg0/00003.wav"]
+    utt_1 = open(wavCouple[0], 'rb')
+    utt_2 = open(wavCouple[1], 'rb')
+    pred = predictor(utt_1, utt_2)
+    input(pred)
 
 
     def count_negative_positive(dataset):
         count = [0, 0]  # [nbNegative, nbPositive]
-
-        for wavCouple in dataset:
+        log = dict()
+        i = 0
+        tbar = tqdm.tqdm(dataset)
+        for wavCouple in tbar:
             utt_1 = open(wavCouple[0], 'rb')
             utt_2 = open(wavCouple[1], 'rb')
             pred = predictor(utt_1, utt_2)
-            print("pred for real true:", pred)
+            tbar.set_description(str(pred) + str(wavCouple))
+            #print("pred for real true:", pred)
             count[pred] += 1
-
+            log[i] = pred
+            i += 1
+            input()
+        print(log)
         return count
 
-    FN, TP = count_negative_positive(tarWavDataset)  # False Negative, True Positive
+    #FN, TP = count_negative_positive(tarWavDataset)  # False Negative, True Positive
     TN, FP = count_negative_positive(nonWavDataset)  # True Negative, False Positive
 
     FR = FN / (TP + FN)  # False Reject

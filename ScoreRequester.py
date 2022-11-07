@@ -19,7 +19,7 @@ class ScoreRequester:
         return req.json()
 
 
-class AchileScoreRequester(ScoreRequester):
+class AchilleScoreRequester(ScoreRequester):
     def __init__(self):
         IP = "achille.univ-avignon.fr"
         PORT = "5002"
@@ -41,7 +41,7 @@ class HPScoreRequester(ScoreRequester):
 
 
 if __name__ == "__main__":
-    asr = HPScoreRequester()
+    asr = AchilleScoreRequester()
     utt_1 = open("recoloc_sb/wavs/Abel_Ezechiel.wav", 'rb')
     utt_2 = open("recoloc_sb/wavs/Abi_yao_Vidal.wav", 'rb')
 

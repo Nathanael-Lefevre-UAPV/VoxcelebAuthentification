@@ -8,7 +8,7 @@ NON = "0"
 
 
 class WavDataset(Dataset):
-    def __init__(self, target):
+    def __init__(self, target, length=0):
         self.target = target
         self.datapath = f"{os.path.dirname(__file__)}"
         self.wavpath = f"{self.datapath}/wav"
@@ -19,16 +19,23 @@ class WavDataset(Dataset):
             self.load_dataset_from_json()
         else:
             self.gen_and_load_dataset()
+        if length == 0:
+            self.len = len(self.dataset)
+        else:
+            self.len = len(self.dataset) if length > len(self.dataset) else length
 
     def __getitem__(self, index) -> T_co:
-        return [f"{self.wavpath}/{self.dataset[index][0]}" for i in [0, 1]]
+        if index >= self.len:
+            raise StopIteration
+        return [f"{self.wavpath}/{self.dataset[index][i]}" for i in [0, 1]]
 
     def __len__(self):
-        return len(self.dataset)
+        return self.len
 
     def load_dataset_from_json(self):
         with open(self.jsonpath, 'r') as jsonFile:
             self.dataset = json.load(jsonFile)[self.target]
+            print(self.dataset[0])
 
     def gen_and_load_dataset(self):
         with open(f"{self.datapath}/test_trials.txt", 'r') as oracleFile:
@@ -48,11 +55,11 @@ class WavDataset(Dataset):
 
 
 class TarWavDataset(WavDataset):
-    def __init__(self):
-        super().__init__(target=TAR)
+    def __init__(self, length=0):
+        super().__init__(target=TAR, length=length)
 
 
 class NonWavDataset(WavDataset):
-    def __init__(self):
-        super().__init__(target=NON)
+    def __init__(self, length=0):
+        super().__init__(target=NON, length=length)
 
